@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    use HasFactory;
+    protected $connection = "mysql";
+    protected $table = "items";
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'name', 'type', 'rarity'
+    ];
 }

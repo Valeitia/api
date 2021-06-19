@@ -7,5 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    use HasFactory;
+    protected $connection = "mysql";
+    protected $table = "inventory";
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'user', 'item', 'amount'
+    ];
+
+    protected $attributes = [
+        'amount' => 1
+    ];
 }
