@@ -62,6 +62,11 @@ class InventoryController extends Controller
                 return $this->errorResponse("You do not have x{$inv->amount} {$item->name}", 422);
             }
 
+            if ($inv->amount === $request->get('amount')) {
+                $inv->delete();
+                return $this->successResponse(null, "x{$request->get('amount')} {$item->name} removed from your inventory", 200);
+            }
+
             $inv->amount -= $request->get('amount');
             $inv->save();
 

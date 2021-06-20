@@ -20,5 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('/auth')->group(function() {
     Route::post('/create', 'AuthController@create');
-    Route::get('/test', 'Controller@test');
+});
+
+Route::prefix('/inventory')->group(function() {
+    Route::post('/add', 'InventoryController@add');
+    Route::post('/remove', 'InventoryController@remove');
 });
