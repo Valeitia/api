@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration
+class CreateEnemyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,16 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('enemy', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("discord_id");
-            $table->integer("gold");
+            $table->string("name");
             $table->integer("level");
-            $table->bigInteger("exp");
             $table->integer("health");
-            $table->integer("helmet")->nullable();
-            $table->integer("chestplate")->nullable();
-            $table->integer("boots")->nullable();
-            $table->integer("weapon")->nullable();
             $table->integer("strength");
             $table->integer("dexterity");
             $table->integer("intelligence");
+            $table->integer("gold");
+            $table->integer("exp");
         });
     }
 
@@ -37,6 +33,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('enemy');
     }
 }

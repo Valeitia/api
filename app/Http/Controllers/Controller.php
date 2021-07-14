@@ -13,7 +13,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ApiResponser;
 
-    public function test() {
+    public function welcome(): \Illuminate\Http\JsonResponse
+    {
         return $this->successResponse(null, "Success", 200);
     }
 }
