@@ -24,22 +24,8 @@ class InventoryController extends Controller
         }
 
         $user = User::where('discord_id', $request->get('discord_id'))->first();
-        $item = Item::find($request->get('item'));
 
-        if ($inv = Inventory::whereIn(['id' => $user->id, 'item' => $request->get('item')])->exists()) {
-            $inv->amount += $request->get('amount');
-            $inv->save();
-
-            return $this->successResponse(null, "x{$request->get('amount')} {$item->name} added to your inventory", 200);
-        }
-
-        $inv = Inventory::create([
-           "user" => $user->id,
-           "item" => $item->id,
-           "amount" => $request->get('amount')
-        ]);
-
-        return $this->successResponse(null, "x{$request->get('amount')} {$item->name} added to your inventory", 200);
+        return $this->successResponse(null, $user->addItem($request->get('item'), $request->get('amount')), 200);
     }
 
     public function remove(Request $request): \Illuminate\Http\JsonResponse
@@ -55,24 +41,7 @@ class InventoryController extends Controller
         }
 
         $user = User::where('discord_id', $request->get('discord_id'))->first();
-        $item = Item::find($request->get('item'));
 
-        if ($inv = Inventory::whereIn(['id' => $user->id, 'item' => $request->get('item')])->exists()) {
-            if ($inv->amount < $request->get('amount')) {
-                return $this->errorResponse("You do not have x{$inv->amount} {$item->name}", 422);
-            }
-
-            if ($inv->amount === $request->get('amount')) {
-                $inv->delete();
-                return $this->successResponse(null, "x{$request->get('amount')} {$item->name} removed from your inventory", 200);
-            }
-
-            $inv->amount -= $request->get('amount');
-            $inv->save();
-
-            return $this->successResponse(null, "x{$request->get('amount')} {$item->name} removed from your inventory", 200);
-        } else {
-            return $this->errorResponse("You do not have x{$inv->amount} {$item->name}", 422);
-        }
+        return $this->successResponse(null, $user->removeItem($request->get('item'), $request->get('amount')), 200);
     }
 }

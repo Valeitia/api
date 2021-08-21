@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->integer("level");
             $table->bigInteger("exp");
             $table->integer("health");
+            $table->integer("energy");
             $table->integer("helmet")->nullable();
             $table->integer("chestplate")->nullable();
             $table->integer("boots")->nullable();

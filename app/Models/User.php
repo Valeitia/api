@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Item;
+use App\Models\Inventory;
+
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -38,4 +41,44 @@ class User extends Authenticatable
         return $this->energy >= $energy;
     }
 
+    public function addItem($item, $amount): string {
+        $item = Item::find($item);
+
+        if ($inv = Inventory::whereIn(['id' => $this->id, 'item' => $item->id])->exists()) {
+            $inv->amount += $amount;
+            $inv->save();
+
+            return "x{$amount} {$item->name} added to your inventory";
+        }
+
+        $inv = Inventory::create([
+            "user" => $this->id,
+            "item" => $item->id,
+            "amount" => $amount
+        ]);
+
+        return "x{$amount} {$item->name} added to your inventory";
+    }
+
+    public function removeItem($item, $amount): string {
+        $item = Item::find($item);
+
+        if ($inv = Inventory::whereIn(['id' => $this->id, 'item' => $item->id])->exists()) {
+            if ($inv->amount < $amount) {
+                return "You do not have x{$amount} {$item->name}";
+            }
+
+            if ($inv->amount === $amount) {
+                $inv->delete();
+                return "x{$amount} {$item->name} removed from your inventory";
+            }
+
+            $inv->amount -= $amount;
+            $inv->save();
+
+            return "x{$amount} {$item->name} removed from your inventory";
+        } else {
+            return "You do not have x{$amount} {$item->name}";
+        }
+    }
 }

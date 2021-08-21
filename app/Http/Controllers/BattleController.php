@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BattleController extends Controller
 {
-    public function battle(Request $request): \Illuminate\Http\JsonResponse
+    public function init(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [
             "discord_id" => "required|integer"
@@ -20,7 +20,7 @@ class BattleController extends Controller
             return $this->errorResponse($validator->messages(), 422);
         }
 
-        $user = User::find($request->get('discord_id'));
+        $user = User::where('discord_id', $request->get('discord_id'))->first();
 
         if (!$user->hasEnoughEnergy(3)) {
             return $this->errorResponse("You do not have enough energy to battle.", 422);
@@ -45,7 +45,7 @@ class BattleController extends Controller
 
             $battle = Battle::create(['user' => $user->id, 'enemy' => $enemy->id, 'health' => $enemy->health]);
         } else {
-            return $this->errorResponse("Oops, something went wrong.", 422);
+            //return $this->errorResponse("Oops, something went wrong.", 422);
         }
 
         $enemy = Enemy::find($battle->enemy);
@@ -91,7 +91,10 @@ class BattleController extends Controller
             }
 
             $data = [
+                "battle" => $battle,
+                "user" => $user,
                 "enemy" => $enemy,
+                "user_hit_chance" => $user_hit_chance,
                 "user_damage" => $user_combined_damage,
                 "enemy_damage" => $enemy_combined_damage,
                 "drops" => []
@@ -100,25 +103,25 @@ class BattleController extends Controller
             $user->health -= $enemy_combined_damage;
             $user->save();
 
-            if ($user_hit_chance <= rand(0, 100)) {
-                $battle->health -= $user_combined_damage;
-                $battle->save();
+            $battle->health -= $user_combined_damage;
+            $battle->save();
 
-                if ($battle->health <= 0) {
-                    $gold = rand(round($enemy->gold / 2), round($enemy->gold * 2));
-                    $exp = rand(round($enemy->exp / 2), round($enemy->exp * 2));
+            if ($battle->health <= 0) {
+                $gold = rand(round($enemy->gold / 2), round($enemy->gold * 2));
+                $exp = rand(round($enemy->exp / 2), round($enemy->exp * 2));
 
-                    $user->gold += $gold;
-                    $user->exp += $exp;
-                    $user->save();
+                $user->gold += $gold;
+                $user->exp += $exp;
+                $user->save();
 
-                    $data["drops"] += ["gold" => $gold, "exp" => $exp];
+                $data["drops"] += ["gold" => $gold, "exp" => $exp];
 
-                    $battle->delete();
-                    return $this->successResponse($data, "Success", 200);
-                } else {
-                    return $this->successResponse($data, "Success", 200);
+                if ($gear = $battle->dropGear() != null) {
+                    $data["items"] = $gear;
                 }
+
+                $battle->delete();
+                return $this->successResponse($data, "Success", 200);
             } else {
                 return $this->successResponse($data, "Success", 200);
             }

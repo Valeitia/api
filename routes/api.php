@@ -28,3 +28,11 @@ Route::prefix('/inventory')->group(function() {
     Route::post('/add', 'InventoryController@add');
     Route::post('/remove', 'InventoryController@remove');
 });
+
+Route::prefix('/battle')->group(function () {
+   Route::post('/init', 'BattleController@init');
+});
+
+Route::prefix('/user')->group(function() {
+    Route::post('/profile', 'UserController@profile');
+});

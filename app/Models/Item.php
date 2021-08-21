@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     protected $connection = "mysql";
-    protected $table = "items";
+    protected $table = "item";
 
     public $timestamps = false;
 
     protected $fillable = [
-        'name', 'type', 'rarity'
+        'name', 'type', 'primary_attribute'
     ];
 }
