@@ -81,4 +81,20 @@ class User extends Authenticatable
             return "You do not have x{$amount} {$item->name}";
         }
     }
+
+    public function canLevelUp(): bool {
+        return $this->exp >= (25 * ($this->level + 1) * ($this->level + 1) - 25 * ($this->level + 1));
+    }
+
+    public function levelUp(): bool {
+        if ($this->canLevelUp()) {
+            $this->increment('level');
+            $this->exp = 0;
+            $this->save();
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -28,7 +28,7 @@ class BattleController extends Controller
 
         $battle = Battle::where('user', $user->id)->first() ?? null;
 
-        if (!Battle::where('user', $user->id)->exists() && $battle === null) {
+        if (!Battle::where('user', $user->id)->exists()) {
             $possible_enemies = null;
             $level_gap = 3;
 
@@ -44,8 +44,6 @@ class BattleController extends Controller
             $enemy = $possible_enemies[rand(0, $possible_enemies_count - 1)];
 
             $battle = Battle::create(['user' => $user->id, 'enemy' => $enemy->id, 'health' => $enemy->health]);
-        } else {
-            //return $this->errorResponse("Oops, something went wrong.", 422);
         }
 
         $enemy = Enemy::find($battle->enemy);
@@ -101,6 +99,7 @@ class BattleController extends Controller
             ];
 
             $user->health -= $enemy_combined_damage;
+            $user->energy -= 3;
             $user->save();
 
             $battle->health -= $user_combined_damage;
@@ -108,17 +107,19 @@ class BattleController extends Controller
 
             if ($battle->health <= 0) {
                 $gold = rand(round($enemy->gold / 2), round($enemy->gold * 2));
-                $exp = rand(round($enemy->exp / 2), round($enemy->exp * 2));
 
                 $user->gold += $gold;
-                $user->exp += $exp;
+                $user->exp += $enemy->exp;
                 $user->save();
 
-                $data["drops"] += ["gold" => $gold, "exp" => $exp];
+                $data["drops"] += ["gold" => $gold, "exp" => $enemy->exp];
 
-                if ($gear = $battle->dropGear() != null) {
-                    $data["items"] = $gear;
-                }
+//                if ($gear = $battle->dropGear() != null) {
+//                    $data["items"] = $gear;
+//                }
+
+
+                if ($user->levelUp()) $data["level_up"] = true;
 
                 $battle->delete();
                 return $this->successResponse($data, "Success", 200);
