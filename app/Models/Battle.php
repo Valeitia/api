@@ -23,45 +23,37 @@ class Battle extends Model
 
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function user()
     {
-        return $this->hasOne("App\Models\User", "id", "user");
+        return $this->hasOne("App\Models\User", "id", "user")->first();
     }
 
-    public function enemy(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function enemy()
     {
-        return $this->hasOne("App\Models\Enemy", "id", "enemy");
+        return $this->hasOne("App\Models\Enemy", "id", "enemy")->first();
     }
 
     public function getStartingHealth(): int {
         return $this->enemy()->health;
     }
 
-    public function dropGear() {
+    public function dropGear($enemyLevel) {
         $rand = rand(0, 1000);
         $stats = [];
 
-        $equipment_types = ["helmet", "chestplate", "boots", "weapon"];
-        $possible_gear = Item::where('type', array_rand($equipment_types, 1))->get();
-        $possible_gear_count = count($possible_gear);
+        $equipment_types = ["helmet", "chestplate", "leggings", "boots", "weapon"];
+        $item = Item::whereIn('type', $equipment_types)->inRandomOrder()->first();
 
-        $item = $possible_gear[rand(0, $possible_gear_count - 1)];
-
-        if ($rand <= 1) {
-            $stats['rarity'] = "Mythic";
-            $stats['strength'] = rand($this->user()->level * 2, round($this->user()->level * 4));
-            $stats['dexterity'] = rand($this->user()->level * 2, round($this->user()->level * 4));
-            $stats['intelligence'] = rand($this->user()->level * 2, round($this->user()->level * 4));
-        } else if ($rand <= 25) {
+        if ($rand <= 25 && $enemyLevel >= 25) {
             $stats['rarity'] = "Legendary";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 2));
-        } else if ($rand <= 50) {
+        } else if ($rand <= 50 && $enemyLevel >= 10) {
             $stats['rarity'] = "Rare";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 1.75));
         } else if ($rand <= 100) {
             $stats['rarity'] = "Uncommon";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 1.50));
-        } else if ($rand <= 200) {
+        } else if ($rand <= 500) {
             $stats['rarity'] = "Common";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 1.10));
         } else {
@@ -69,9 +61,10 @@ class Battle extends Model
         }
 
         return Inventory::create([
+            "user" => $this->user()->id,
             "item" => $item->id,
             "amount" => 1,
-            "stats" => $stats
+            "stats" => json_encode($stats)
         ]);
     }
 }

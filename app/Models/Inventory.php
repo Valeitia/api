@@ -19,4 +19,12 @@ class Inventory extends Model
     protected $attributes = [
         'amount' => 1
     ];
+
+    public function item() {
+        return $this->hasOne('App\Models\Item', 'id', 'item')->first();
+    }
+
+    public function user() {
+        return $this->hasOne('App\Models\User', 'id', 'user')->first();
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Battle;
 use App\Models\Enemy;
 use App\Models\User;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,13 +18,13 @@ class BattleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->errorResponse($validator->messages(), 422);
+            return $this->errorResponse($validator->messages(), 200);
         }
 
         $user = User::where('discord_id', $request->get('discord_id'))->first();
 
         if (!$user->hasEnoughEnergy(3)) {
-            return $this->errorResponse("You do not have enough energy to battle.", 422);
+            return $this->errorResponse("You do not have enough energy to battle.", 200);
         }
 
         $battle = Battle::where('user', $user->id)->first() ?? null;
@@ -114,9 +115,13 @@ class BattleController extends Controller
 
                 $data["drops"] += ["gold" => $gold, "exp" => $enemy->exp];
 
-//                if ($gear = $battle->dropGear() != null) {
-//                    $data["items"] = $gear;
-//                }
+                if ($gear = $battle->dropGear($enemy->level)) {
+                    if ($gear != null) {
+                        $data["items"] = $gear;
+                        $data["items"]["stats"] = json_decode($data["items"]["stats"]);
+                        $data["items"]["item"] = Item::find($data["items"]["item"]);
+                    }
+                }
 
 
                 if ($user->levelUp()) $data["level_up"] = true;
@@ -128,7 +133,7 @@ class BattleController extends Controller
             }
         } else {
             $battle->delete();
-            return $this->errorResponse("Oops, something went wrong.", 422);
+            return $this->errorResponse("Oops, something went wrong.", 200);
         }
     }
 }

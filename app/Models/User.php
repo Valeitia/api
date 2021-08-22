@@ -18,7 +18,7 @@ class User extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'discord_id', 'gold', 'level', 'exp', 'health', 'energy', 'helmet', 'chestplate', 'boots', 'weapon', 'strength', 'dexterity', 'intelligence'
+        'discord_id', 'gold', 'level', 'exp', 'health', 'energy', 'helmet', 'chestplate', 'boots', 'weapon', 'strength', 'dexterity', 'intelligence', 'gathering', 'luck'
     ];
 
     protected $attributes = [
@@ -29,7 +29,9 @@ class User extends Authenticatable
         'energy' => 100,
         'strength' => 1,
         'dexterity' => 1,
-        'intelligence' => 1
+        'intelligence' => 1,
+        'gathering' => 1,
+        'luck' => 1
     ];
 
     public function hasOngoingBattle(): \Illuminate\Database\Eloquent\Relations\HasOne
@@ -96,5 +98,33 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function equip(Inventory $inv) {
+        $stats = json_decode($inv->stats, true);
+        $item = $inv->item();
+        switch($item->type) {
+            case "helmet":
+                $this->helmet = $inv->id;
+                break;
+            case "chestplate":
+                $this->chestplate = $inv->id;
+                break;
+            case "leggings":
+                $this->leggings = $inv->id;
+                break;
+            case "boots":
+                $this->boots = $inv->id;
+                break;
+            case "weapon":
+                $this->weapon = $inv->id;
+                break;
+            default:
+                break;
+        }
+
+        $this->save();
+
+        User::where('id', $this->id)->update([$item->primary_attribute => 1 + $stats[$item->primary_attribute]]);
     }
 }

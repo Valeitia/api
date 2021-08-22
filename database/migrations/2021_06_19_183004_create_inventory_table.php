@@ -18,6 +18,7 @@ class CreateInventoryTable extends Migration
             $table->integer("user");
             $table->integer("item");
             $table->integer("amount");
+            $table->string("stats")->nullable();
         });
     }
 

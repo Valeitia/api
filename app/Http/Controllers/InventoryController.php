@@ -44,4 +44,29 @@ class InventoryController extends Controller
 
         return $this->successResponse(null, $user->removeItem($request->get('item'), $request->get('amount')), 200);
     }
+
+    public function equip(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "discord_id" => "required|integer",
+            "inventory_id" => "required|integer"
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        if (!Inventory::where('id', $request->get('inventory_id'))->exists()) {
+            return $this->errorResponse("That item doesn't exist.", 200);
+        }
+
+        $inv = Inventory::find($request->get('inventory_id'));
+
+        if ($inv->user()->discord_id == $request->get('discord_id')) {
+            $inv->user()->equip($inv);
+
+            return $this->successResponse(null, "Successfully equipped {$inv->item()->name}.");
+        }
+
+        return $this->errorResponse("You do not own #{$inv->id}", 200);
+    }
 }

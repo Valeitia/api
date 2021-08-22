@@ -28,6 +28,8 @@ class CreateUsersTable extends Migration
             $table->integer("strength");
             $table->integer("dexterity");
             $table->integer("intelligence");
+            $table->integer("gathering");
+            $table->integer("luck");
         });
     }
 

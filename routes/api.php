@@ -27,6 +27,7 @@ Route::prefix('/auth')->group(function() {
 Route::prefix('/inventory')->group(function() {
     Route::post('/add', 'InventoryController@add');
     Route::post('/remove', 'InventoryController@remove');
+    Route::post('/equip', 'InventoryController@equip');
 });
 
 Route::prefix('/battle')->group(function () {
