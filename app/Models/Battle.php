@@ -53,7 +53,7 @@ class Battle extends Model
         } else if ($rand <= 100) {
             $stats['rarity'] = "Uncommon";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 1.50));
-        } else if ($rand <= 500) {
+        } else if ($rand <= 200) {
             $stats['rarity'] = "Common";
             $stats[$item->primary_attribute] = rand($this->user()->level, round($this->user()->level * 1.10));
         } else {
