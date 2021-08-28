@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->integer("energy");
             $table->integer("helmet")->nullable();
             $table->integer("chestplate")->nullable();
+            $table->integer("leggings")->nullable();
             $table->integer("boots")->nullable();
             $table->integer("weapon")->nullable();
             $table->integer("strength");

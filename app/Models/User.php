@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Item;
 use App\Models\Inventory;
+use App\Models\Item;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -103,28 +103,46 @@ class User extends Authenticatable
     public function equip(Inventory $inv) {
         $stats = json_decode($inv->stats, true);
         $item = $inv->item();
-        switch($item->type) {
-            case "helmet":
-                $this->helmet = $inv->id;
-                break;
-            case "chestplate":
-                $this->chestplate = $inv->id;
-                break;
-            case "leggings":
-                $this->leggings = $inv->id;
-                break;
-            case "boots":
-                $this->boots = $inv->id;
-                break;
-            case "weapon":
-                $this->weapon = $inv->id;
-                break;
-            default:
-                break;
+
+        if ($this->{$item->type} != null) {
+            if ($this->{$item->type} == $inv->id) return;
+
+            $previous = Inventory::where(["user" => $this->id, "id" => $this->{$item->type}])->first();
+            $previousStats = json_decode($previous->stats, true);
+
+            $this->decrement($previous->item()->primary_attribute, $previousStats[$previous->item()->primary_attribute]);
+            $this->{$item->type} = $inv->id;
+            $this->increment($item->primary_attribute, $stats[$item->primary_attribute]);
+            $this->save();
+            return;
         }
 
+        $this->{$item->type} = $inv->id;
+        $this->increment($item->primary_attribute, $stats[$item->primary_attribute]);
         $this->save();
+    }
 
-        User::where('id', $this->id)->update([$item->primary_attribute => 1 + $stats[$item->primary_attribute]]);
+    public function helmet() {
+        return $this->hasOne('App\Models\Inventory', 'id', 'helmet')->first();
+    }
+
+    public function chestplate() {
+        return $this->hasOne('App\Models\Inventory', 'id', 'chestplate')->first();
+    }
+
+    public function leggings() {
+        return $this->hasOne('App\Models\Inventory', 'id', 'leggings')->first();
+    }
+
+    public function boots() {
+        return $this->hasOne('App\Models\Inventory', 'id', 'boots')->first();
+    }
+
+    public function weapon() {
+        return $this->hasOne('App\Models\Inventory', 'id', 'weapon')->first();
+    }
+
+    public function inventory() {
+        return $this->hasMany('App\Models\Inventory', 'user', 'id')->get();
     }
 }

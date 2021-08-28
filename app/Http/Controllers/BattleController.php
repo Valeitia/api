@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Battle;
 use App\Models\Enemy;
+use App\Models\Inventory;
 use App\Models\User;
 use App\Models\Item;
 use Illuminate\Http\Request;
@@ -56,13 +57,6 @@ class BattleController extends Controller
             $user_crit_chance = 0;
 
             $user_combined_damage += $user->strength;
-
-            if ($user->weapon != null) {
-                $item = Item::find($user->weapon);
-                $item_stats = json_decode($item->stats);
-
-                $user_combined_damage += $item_stats['damage'];
-            }
 
             if ($user->level < $enemy->level) {
                 $user_hit_chance -= ($enemy->level - $user->level) * 5;

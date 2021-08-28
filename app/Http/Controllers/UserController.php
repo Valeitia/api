@@ -20,6 +20,35 @@ class UserController extends Controller
 
         $user = User::where('discord_id', $request->get('discord_id'))->first();
 
-        return $this->successResponse(User::where('discord_id', $request->get('discord_id'))->first(), "Profile fetched successfully.", 200);
+        $data = [
+            "user" => $user,
+        ];
+
+        if ($user->helmet != null) {
+            $data["helmet"]["inv"] = $user->helmet();
+            $data["helmet"]["item"] = $user->helmet()->item();
+        }
+
+        if ($user->chestplate != null) {
+            $data["chestplate"]["inv"] = $user->chestplate();
+            $data["chestplate"]["item"] = $user->chestplate()->item();
+        }
+
+        if ($user->leggings != null) {
+            $data["leggings"]["inv"] = $user->leggings();
+            $data["leggings"]["item"] = $user->leggings()->item();
+        }
+
+        if ($user->boots != null) {
+            $data["boots"]["inv"] = $user->boots();
+            $data["boots"]["item"] = $user->boots()->item();
+        }
+
+        if ($user->weapon != null) {
+            $data["weapon"]["inv"] = $user->weapon();
+            $data["weapon"]["item"] = $user->weapon()->item();
+        }
+
+        return $this->successResponse($data, "Profile fetched successfully.", 200);
     }
 }

@@ -69,4 +69,52 @@ class InventoryController extends Controller
 
         return $this->errorResponse("You do not own #{$inv->id}", 200);
     }
+
+    public function inventory(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "discord_id" => "required|integer",
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $user = User::where('discord_id', $request->get('discord_id'))->first();
+        $inventory = Inventory::where("user", $user->id)->get();
+        $data = [];
+
+        $i = 0;
+        foreach ($inventory as $item) {
+            $data[$i]["inv"] = $item;
+            $data[$i]["item"] = $item->item();
+            $i++;
+        }
+
+        return $this->successResponse($data, "Inventory retrieved.", 200);
+    }
+
+    public function item(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "inv" => "required|integer",
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $inv = Inventory::find($request->get('inv'));
+
+        if ($inv == null) {
+            return $this->errorResponse("That item doesn't exist.", 200);
+        }
+
+        $data = [
+            "inv" => $inv,
+            "item" => $inv->item(),
+            "stats" => json_decode($inv->stats, true),
+            "user" => $inv->user()
+        ];
+
+        return $this->successResponse($data, "Item retrieved successfully", 200);
+    }
 }

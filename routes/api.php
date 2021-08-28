@@ -28,6 +28,9 @@ Route::prefix('/inventory')->group(function() {
     Route::post('/add', 'InventoryController@add');
     Route::post('/remove', 'InventoryController@remove');
     Route::post('/equip', 'InventoryController@equip');
+    Route::post('/get', 'InventoryController@inventory');
+
+    Route::post('/item', 'InventoryController@item');
 });
 
 Route::prefix('/battle')->group(function () {
@@ -36,4 +39,12 @@ Route::prefix('/battle')->group(function () {
 
 Route::prefix('/user')->group(function() {
     Route::post('/profile', 'UserController@profile');
+});
+
+Route::prefix('/auction')->group(function() {
+   Route::post('/buy', 'AuctionController@buy');
+   Route::post('/add', 'AuctionController@add');
+   Route::post('/remove', 'AuctionController@remove');
+
+   Route::get('/listing', 'AuctionController@listing');
 });
