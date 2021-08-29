@@ -64,7 +64,7 @@ class BattleController extends Controller
 
             if ($user->strength > $enemy->strength) {
                 $user_combined_damage += ($user->strength - $enemy->strength);
-                $user_crit_chance += ($user->strength - $enemy->strength) * 10;
+                $user_crit_chance += ($user->strength - $enemy->strength) * 5;
             } else if ($user->strength === $enemy->strength) {
                 $user_combined_damage += $user->strength;
                 $enemy_combined_damage += $enemy->strength;
@@ -76,8 +76,8 @@ class BattleController extends Controller
                 $user_hit_chance -= ($enemy->level - $user->level) * 5;
             }
 
-            $user_combined_damage = rand(round($user_combined_damage / 2), round($user_combined_damage * 2));
-            $enemy_combined_damage = rand(round($enemy_combined_damage / 2), round($enemy_combined_damage * 2));
+            $user_combined_damage = rand(round($user_combined_damage / 1.2), round($user_combined_damage * 1.2));
+            $enemy_combined_damage = rand(round($enemy_combined_damage / 1.2), round($enemy_combined_damage * 1.2));
 
             if ($user_crit_chance <= rand(0, 100)) {
                 $user_combined_damage = round($user_combined_damage * 2);
