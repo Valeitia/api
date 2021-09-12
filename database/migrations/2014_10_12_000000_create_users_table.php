@@ -31,6 +31,7 @@ class CreateUsersTable extends Migration
             $table->integer("intelligence");
             $table->integer("gathering");
             $table->integer("luck");
+            $table->string("referral_code");
         });
     }
 

@@ -63,7 +63,7 @@ class BattleController extends Controller
             }
 
             if ($user->strength > $enemy->strength) {
-                $user_combined_damage += ($user->strength - $enemy->strength);
+                $user_combined_damage *= round($user->strength / $enemy->strength);
                 $user_crit_chance += ($user->strength - $enemy->strength) * 5;
                 $enemy_combined_damage += $enemy->strength * ($enemy->strength / $user->strength);
             } else if ($user->strength === $enemy->strength) {

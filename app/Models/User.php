@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\Inventory;
 use App\Models\Item;
+use App\Models\Referral;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -18,7 +20,7 @@ class User extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'discord_id', 'gold', 'level', 'exp', 'health', 'energy', 'helmet', 'chestplate', 'boots', 'weapon', 'strength', 'dexterity', 'intelligence', 'gathering', 'luck'
+        'discord_id', 'gold', 'level', 'exp', 'health', 'energy', 'helmet', 'chestplate', 'boots', 'weapon', 'strength', 'dexterity', 'intelligence', 'gathering', 'luck', 'referral_code'
     ];
 
     protected $attributes = [
@@ -144,5 +146,9 @@ class User extends Authenticatable
 
     public function inventory() {
         return $this->hasMany('App\Models\Inventory', 'user', 'id')->get();
+    }
+
+    public function referrals() {
+        return Referral::where('code', $this->referral_code)->get()->count();
     }
 }
