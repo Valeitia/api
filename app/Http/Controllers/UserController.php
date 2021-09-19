@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Referral;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -50,5 +51,26 @@ class UserController extends Controller
         }
 
         return $this->successResponse($data, "Profile fetched successfully.", 200);
+    }
+
+    public function refer(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "discord_id" => "required|integer"
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $user = User::where('discord_id', $request->get('discord_id'))->first();
+
+        $referrals_count = Referral::where('code', $user->referral_code)->get()->count();
+
+        $data = [
+          "code" => $user->referral_code,
+          "referrals" => $referrals_count
+        ];
+
+        return $this->successResponse($data, "Referrals fetched successfully.", 200);
     }
 }

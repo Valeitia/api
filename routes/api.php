@@ -39,6 +39,7 @@ Route::prefix('/battle')->group(function () {
 
 Route::prefix('/user')->group(function() {
     Route::post('/profile', 'UserController@profile');
+    Route::post('/refer', 'UserController@refer');
 });
 
 Route::prefix('/auction')->group(function() {

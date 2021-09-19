@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Referral extends Model
 {
     protected $connection = "mysql";
-    protected $table = "users";
+    protected $table = "referrals";
 
     public $timestamps = false;
 

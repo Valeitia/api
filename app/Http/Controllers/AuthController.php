@@ -35,7 +35,7 @@ class AuthController extends Controller
             'referral_code' => $user_referral_code
         ]);
 
-        if ($request->get('referral') != null) {
+        if ($request->get('referral') != null && !Referral::where('user', $user->id)->exists()) {
             Referral::create([
                 'user' => $user->id,
                 'code' => $request->get('referral')
